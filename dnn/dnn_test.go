@@ -11,9 +11,11 @@ func TestCreateNetwork(t *testing.T) {
 	fmt.Println(out)
 }
 
+var Result []float64
+
 func BenchmarkFF(b *testing.B) {
 	n := CreateNetwork(2, 5_000, 5_000, 5_000, 5_000, 5_000, 1_000)
-	for b.Loop() {
-		n.Forward(0.5, 0.4)
+	for i := 0; i < b.N; i++ {
+		Result = n.Forward(0.5, 0.4)
 	}
 }

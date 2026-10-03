@@ -9,19 +9,24 @@ type Network []float64
 func (n Network) Forward(in ...float64) []float64 {
 	nlayers := n[0]
 
-	lsize := int(n[1])
 	lstart := 2 // 0 is network layer count; 1 is input layer size
-	nprev := len(in)
+	nprev := int(n[1])
 	prev := in
 
+	var lsize int
+	var nsize int
+	var lend int
 	var next []float64
+
 	for range int(nlayers - 1) { // start at first hidden layer
-		lstart = (lstart + 1)            // skip layer size
-		nsize := (nprev + 1)             // neuron size (input weights + bias)
-		lend := lstart + (nsize * lsize) // layer start + neuron size * layer size
+		lsize = int(n[lstart])
+		lstart = (lstart + 1)           // skip layer size
+		nsize = (nprev + 1)             // neuron size (input weights + bias)
+		lend = lstart + (nsize * lsize) // layer start + neuron size * layer size
 
 		next = []float64{}
-		for idx := lstart; idx < lend; idx += nsize {
+		var idx int
+		for idx = lstart; idx < lend; idx += nsize {
 			v := n[idx] // bias
 			for nidx := range nprev {
 				v += prev[nidx] * n[idx+nidx+1] // skip bias, take weights
@@ -32,7 +37,6 @@ func (n Network) Forward(in ...float64) []float64 {
 		lstart = lend
 		nprev = lsize
 		prev = next
-		lsize = int(n[lstart])
 	}
 
 	return next
