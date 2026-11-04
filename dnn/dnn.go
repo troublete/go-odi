@@ -9,8 +9,9 @@ import (
 const (
 	BITRECORD int = 1
 
-	ACTIVATIONSIGMOID float64 = 0
-	ACTIVATIONRELU    float64 = 1
+	ACTIVATIONSIGMOID float64 = iota
+	ACTIVATIONRELU
+	ACTIVATIONIDENTITY
 )
 
 var (
@@ -77,6 +78,8 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 				nevalue = Sigmoid(nevalue)
 			case ACTIVATIONRELU:
 				nevalue = Relu(nevalue)
+			case ACTIVATIONIDENTITY:
+				nevalue = Identity(nevalue)
 			default:
 				return nil, nil, ErrUnknownActivation
 			}
@@ -170,6 +173,8 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 		outact = DerivativeSigmoid
 	case ACTIVATIONRELU:
 		outact = DerivativeRelu
+	case ACTIVATIONIDENTITY:
+		outact = DerivativeIdentity
 	default:
 		// unreachable, as the forward pass would already exit
 	}
@@ -192,6 +197,8 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 			lact = DerivativeSigmoid
 		case ACTIVATIONRELU:
 			lact = DerivativeRelu
+		case ACTIVATIONIDENTITY:
+			lact = DerivativeIdentity
 		default:
 			// unreachable, as forward pass will already flag it
 		}

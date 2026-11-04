@@ -74,6 +74,17 @@ func TestNetworkForward(t *testing.T) {
 		}
 	})
 
+	t.Run("with identity", func(t *testing.T) {
+		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
+		n := CreateNetwork(r, 2, 2, 1)
+		n.SetActivation(ACTIVATIONIDENTITY)
+		result, _, err := n.Forward(0.5, 0.3)
+		if len(result) == 0 || err != nil {
+			t.Error(err)
+			t.Error("failed to propagate")
+		}
+	})
+
 	t.Run("input too small", func(t *testing.T) {
 		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 		n := CreateNetwork(r, 2, 2, 1)
@@ -191,6 +202,39 @@ func TestNetworkBackpropagate(t *testing.T) {
 		}
 
 		af := []float64{1, 3, 2, 1, 2, 1, 0.8943510002023033, 0.2930847400040642, 0.20347583513135614, 0.6055636022263029, 0.3175036626559083, 0.7258724537161065, 1, 1, 0.3604112572996504, 0.4586616486588208, 0.652848720333179}
+		for k := range after {
+			if before[k] != af[k] {
+				t.Error("failed to produce expected network")
+			}
+		}
+	})
+
+	t.Run("with identity", func(t *testing.T) {
+		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
+		n := CreateNetwork(r, 2, 2, 1)
+		n.SetActivation(ACTIVATIONIDENTITY)
+
+		var before []float64
+		copy(n, before)
+
+		for range 1 {
+			err := n.Backpropagate([]float64{1, 0}, []float64{1}, .1)
+			if err != nil {
+				t.Error(err)
+			}
+		}
+
+		var after []float64
+		copy(n, after)
+
+		bf := []float64{0, 3, 2, 3, 2, 3, 0.9379143012631059, 0.3366480410648668, 0.20347583513135614, 0.6611941052017176, 0.37313416563132307, 0.7258724537161065, 1, 3, 0.43036139413008245, 0.5388613128715701, 0.724286260687862}
+		for k := range before {
+			if before[k] != bf[k] {
+				t.Error("failed to produce expected network")
+			}
+		}
+
+		af := []float64{1, 3, 2, 3, 2, 3, 0.8943510002023033, 0.2930847400040642, 0.20347583513135614, 0.6055636022263029, 0.3175036626559083, 0.7258724537161065, 1, 3, 0.3604112572996504, 0.4586616486588208, 0.652848720333179}
 		for k := range after {
 			if before[k] != af[k] {
 				t.Error("failed to produce expected network")

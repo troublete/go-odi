@@ -21,3 +21,11 @@ func DerivativeRelu(y float64) float64 {
 		return 0
 	}
 }
+
+func Identity(x float64) float64 {
+	return x
+}
+
+func DerivativeIdentity(_ float64) float64 {
+	return 1
+}
