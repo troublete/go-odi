@@ -13,6 +13,12 @@ const (
 	ACTIVATIONRELU    float64 = 1
 )
 
+var (
+	ErrInputTooSmall       = fmt.Errorf("input is to small; n must match exact number of input params")
+	ErrUnknownActivation   = fmt.Errorf("unknown activation function")
+	ErrInvalidTrainingGoal = fmt.Errorf("training goal and output layer size mismatch")
+)
+
 type Network []float64
 
 // Inference; see Forward
@@ -24,10 +30,6 @@ func (n Network) Inference(in ...float64) ([]float64, []float64, error) {
 // set to record; the second parameter returned will be the neuron input/outputs per layer (in order)
 // this should be used when querying the network
 func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
-	if float64(len(in)) != n[2] {
-		return nil, nil, fmt.Errorf("input doesn't match required input")
-	}
-
 	netflags := int(n[0])
 	record := netflags&BITRECORD == 1
 	nlayers := n[1]
@@ -37,7 +39,7 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 	prev := in
 
 	if len(in) != nprev {
-		return nil, nil, fmt.Errorf("input is to small; n must match exact number of input params")
+		return nil, nil, ErrInputTooSmall
 	}
 
 	var lsize int
@@ -75,6 +77,8 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 				nevalue = Sigmoid(nevalue)
 			case ACTIVATIONRELU:
 				nevalue = Relu(nevalue)
+			default:
+				return nil, nil, ErrUnknownActivation
 			}
 
 			if record {
@@ -93,7 +97,8 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 
 // SetRecording adds the bit flag as to make the network record its forward pass input & output values
 func (n Network) SetRecording() {
-	n[0] += float64(BITRECORD)
+	in := int(n[0])
+	n[0] = float64(in | BITRECORD)
 }
 
 type NetworkMeta struct {
@@ -148,6 +153,10 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 
 	m := n.Analyse()
 
+	if len(want) != int(m.LayerSizes[len(m.LayerSizes)-1]) {
+		return ErrInvalidTrainingGoal
+	}
+
 	out, record, err := n.Forward(in...)
 	if err != nil {
 		return err
@@ -161,6 +170,8 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 		outact = DerivativeSigmoid
 	case ACTIVATIONRELU:
 		outact = DerivativeRelu
+	default:
+		// unreachable, as the forward pass would already exit
 	}
 	for i, o := range out {
 		oerr[i] = (want[i] - o) * outact(o)
@@ -181,6 +192,8 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 			lact = DerivativeSigmoid
 		case ACTIVATIONRELU:
 			lact = DerivativeRelu
+		default:
+			// unreachable, as forward pass will already flag it
 		}
 
 		properr := make([]float64, int(ninputs))

@@ -1,6 +1,9 @@
 # go-odi 
 > pure go, CPU-only: DNN-format, inference and training
 
+[![test](https://github.com/troublete/go-odi/actions/workflows/test.yml/badge.svg)](https://github.com/troublete/go-odi/actions/workflows/test.yml)
+
+
 ## Introduction
 
 This module is meant to provide efficient, accessible and scalable DNN integration for any application. It is build upon
