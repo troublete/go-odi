@@ -66,7 +66,7 @@ func TestNetworkForward(t *testing.T) {
 	t.Run("with relu", func(t *testing.T) {
 		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 		n := CreateNetwork(r, 2, 2, 1)
-		n.SetActivation(ACTIVATIONRELU)
+		n.SetActivation(ActivationRelu)
 		result, _, err := n.Forward(0.5, 0.3)
 		if len(result) == 0 || err != nil {
 			t.Error(err)
@@ -77,7 +77,7 @@ func TestNetworkForward(t *testing.T) {
 	t.Run("with identity", func(t *testing.T) {
 		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 		n := CreateNetwork(r, 2, 2, 1)
-		n.SetActivation(ACTIVATIONIDENTITY)
+		n.SetActivation(ActivationIdentity)
 		result, _, err := n.Forward(0.5, 0.3)
 		if len(result) == 0 || err != nil {
 			t.Error(err)
@@ -133,11 +133,11 @@ func TestNetworkAnalyse(t *testing.T) {
 func TestNetworkSetActivation(t *testing.T) {
 	r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 	n := CreateNetwork(r, 2, 2, 1)
-	n.SetActivation(ACTIVATIONSIGMOID, ACTIVATIONRELU)
+	n.SetActivation(ActivationSigmoid, ActivationRelu)
 	meta := n.Analyse()
-	if n[meta.LayerIndex[0]+1] != ACTIVATIONSIGMOID ||
-		n[meta.LayerIndex[1]+1] != ACTIVATIONRELU ||
-		n[meta.LayerIndex[2]+1] != ACTIVATIONRELU {
+	if n[meta.LayerIndex[0]+1] != ActivationSigmoid ||
+		n[meta.LayerIndex[1]+1] != ActivationRelu ||
+		n[meta.LayerIndex[2]+1] != ActivationRelu {
 		t.Error("failed to set correct layer activations")
 	}
 }
@@ -179,7 +179,7 @@ func TestNetworkBackpropagate(t *testing.T) {
 	t.Run("with relu", func(t *testing.T) {
 		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 		n := CreateNetwork(r, 2, 2, 1)
-		n.SetActivation(ACTIVATIONRELU)
+		n.SetActivation(ActivationRelu)
 
 		var before []float64
 		copy(n, before)
@@ -212,7 +212,7 @@ func TestNetworkBackpropagate(t *testing.T) {
 	t.Run("with identity", func(t *testing.T) {
 		r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 		n := CreateNetwork(r, 2, 2, 1)
-		n.SetActivation(ACTIVATIONIDENTITY)
+		n.SetActivation(ActivationIdentity)
 
 		var before []float64
 		copy(n, before)

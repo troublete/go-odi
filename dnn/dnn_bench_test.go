@@ -21,7 +21,7 @@ func BenchmarkFF100M(b *testing.B) {
 func BenchmarkFF100MRelu(b *testing.B) {
 	r := rand.New(rand.NewChaCha8(sha3.Sum256([]byte("test"))))
 	n := CreateNetwork(r, 2, 5_000, 5_000, 5_000, 5_000, 5_000, 1_000)
-	n.SetActivation(ACTIVATIONRELU)
+	n.SetActivation(ActivationRelu)
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {

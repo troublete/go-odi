@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	BITRECORD int = 1
+	BitRecord int = 1
 
-	ACTIVATIONSIGMOID float64 = iota
-	ACTIVATIONRELU
-	ACTIVATIONIDENTITY
+	ActivationSigmoid float64 = iota - 1
+	ActivationRelu
+	ActivationIdentity
 )
 
 var (
@@ -32,7 +32,7 @@ func (n Network) Inference(in ...float64) ([]float64, []float64, error) {
 // this should be used when querying the network
 func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 	netflags := int(n[0])
-	record := netflags&BITRECORD == 1
+	record := netflags&BitRecord == 1
 	nlayers := n[1]
 
 	lstart := 4 // 0 is network meta info; 1 is network layer count; 2 is input layer size; 3 is layer placeholder for activation function
@@ -74,11 +74,11 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 			}
 
 			switch lact {
-			case ACTIVATIONSIGMOID:
+			case ActivationSigmoid:
 				nevalue = Sigmoid(nevalue)
-			case ACTIVATIONRELU:
+			case ActivationRelu:
 				nevalue = Relu(nevalue)
-			case ACTIVATIONIDENTITY:
+			case ActivationIdentity:
 				nevalue = Identity(nevalue)
 			default:
 				return nil, nil, ErrUnknownActivation
@@ -101,7 +101,7 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 // SetRecording adds the bit flag as to make the network record its forward pass input & output values
 func (n Network) SetRecording() {
 	in := int(n[0])
-	n[0] = float64(in | BITRECORD)
+	n[0] = float64(in | BitRecord)
 }
 
 type NetworkMeta struct {
@@ -150,7 +150,7 @@ func (n Network) SetActivation(act ...float64) {
 // this function is rather to be seen as convenience or descent baseline
 // than optimized training
 func (n Network) Backpropagate(in []float64, want []float64, learningRate float64) error {
-	if int(n[0])&BITRECORD != 1 {
+	if int(n[0])&BitRecord != 1 {
 		n.SetRecording()
 	}
 
@@ -169,11 +169,11 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 	oerr := make([]float64, len(out)) // output error signal
 	var outact func(float64) float64
 	switch n[m.LayerIndex[len(m.LayerIndex)-1]+1] {
-	case ACTIVATIONSIGMOID:
+	case ActivationSigmoid:
 		outact = DerivativeSigmoid
-	case ACTIVATIONRELU:
+	case ActivationRelu:
 		outact = DerivativeRelu
-	case ACTIVATIONIDENTITY:
+	case ActivationIdentity:
 		outact = DerivativeIdentity
 	default:
 		// unreachable, as the forward pass would already exit
@@ -193,11 +193,11 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 
 		var lact func(float64) float64
 		switch n[plidx] {
-		case ACTIVATIONSIGMOID:
+		case ActivationSigmoid:
 			lact = DerivativeSigmoid
-		case ACTIVATIONRELU:
+		case ActivationRelu:
 			lact = DerivativeRelu
-		case ACTIVATIONIDENTITY:
+		case ActivationIdentity:
 			lact = DerivativeIdentity
 		default:
 			// unreachable, as forward pass will already flag it
@@ -254,7 +254,7 @@ func CreateNetwork(r *rand.Rand, layers ...int) Network {
 	var last float64
 	for _, l := range layers {
 		n = append(n, float64(l))        // append n layer size
-		n = append(n, ACTIVATIONSIGMOID) // append n activation function preference; 0 = sigmoid, 1 = relu
+		n = append(n, ActivationSigmoid) // append n activation function preference
 		if last != 0 {
 			for range l {
 				n = append(n, r.Float64()) // append bias

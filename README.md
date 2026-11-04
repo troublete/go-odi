@@ -68,7 +68,7 @@ Index 0 (network[0]) = RESERVED (used for bitflags at the moment to trigger reco
 Index 1 = Total layer count (input+hidden+output)
 Index 2-n = Layer definitions (the layers are defined in sequential orders)
     Index n+1 = Layer size (the amount of fully connected neurons are on the layer)
-    Index n+2 = Layer activation function (every layer can choose its own activation function; following options are supported 0 = Sigmoid, 1 = ReLU)
+    Index n+2 = Layer activation function (every layer can choose its own activation function; following options are supported 0 = Sigmoid, 1 = ReLU, 2 = Identity)
     Index n+3-m = Bias + Input weights of neurons in order, sequentially listed 
 ```
 
