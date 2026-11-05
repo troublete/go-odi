@@ -33,26 +33,62 @@ The benchmarks will show that it solves all of this adequately.
 ```txt
 cpu: Apple M1
 BenchmarkFF100M
-BenchmarkFF100M-8         	       7	 148820143 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100M-8         	       8	 133940344 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100M-8         	       8	 135419364 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100M-8         	       8	 133757922 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100M-8         	       8	 133548260 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100M-8         	       8	 133576021 ns/op	  212992 B/op	       6 allocs/op
 BenchmarkFF100MRelu
-BenchmarkFF100MRelu-8     	       8	 133111417 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100MRelu-8     	       8	 132232984 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100MRelu-8     	       8	 132052995 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100MRelu-8     	       8	 131462516 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100MRelu-8     	       8	 131548708 ns/op	  212992 B/op	       6 allocs/op
+BenchmarkFF100MRelu-8     	       8	 133954932 ns/op	  212992 B/op	       6 allocs/op
 BenchmarkFF10M
-BenchmarkFF10M-8          	      91	  13019464 ns/op	   54536 B/op	       3 allocs/op
+BenchmarkFF10M-8          	      87	  12985376 ns/op	   54536 B/op	       3 allocs/op
+BenchmarkFF10M-8          	      92	  12934183 ns/op	   54536 B/op	       3 allocs/op
+BenchmarkFF10M-8          	      92	  12933334 ns/op	   54536 B/op	       3 allocs/op
+BenchmarkFF10M-8          	      92	  12926046 ns/op	   54536 B/op	       3 allocs/op
+BenchmarkFF10M-8          	      92	  13006395 ns/op	   54536 B/op	       3 allocs/op
 BenchmarkFF100K
 BenchmarkFF100K/wide
-BenchmarkFF100K/wide-8    	    7192	    163010 ns/op	    5384 B/op	       3 allocs/op
+BenchmarkFF100K/wide-8    	    7315	    162266 ns/op	    5384 B/op	       3 allocs/op
+BenchmarkFF100K/wide-8    	    7342	    162098 ns/op	    5384 B/op	       3 allocs/op
+BenchmarkFF100K/wide-8    	    7383	    161764 ns/op	    5384 B/op	       3 allocs/op
+BenchmarkFF100K/wide-8    	    7375	    161889 ns/op	    5384 B/op	       3 allocs/op
+BenchmarkFF100K/wide-8    	    7431	    161832 ns/op	    5384 B/op	       3 allocs/op
 BenchmarkFF100K/deep
-BenchmarkFF100K/deep-8    	    6475	    170830 ns/op	    8968 B/op	      11 allocs/op
+BenchmarkFF100K/deep-8    	    6960	    170068 ns/op	    8968 B/op	      11 allocs/op
+BenchmarkFF100K/deep-8    	    6781	    169763 ns/op	    8968 B/op	      11 allocs/op
+BenchmarkFF100K/deep-8    	    6936	    169532 ns/op	    8968 B/op	      11 allocs/op
+BenchmarkFF100K/deep-8    	    7076	    169476 ns/op	    8968 B/op	      11 allocs/op
+BenchmarkFF100K/deep-8    	    7082	    169587 ns/op	    8968 B/op	      11 allocs/op
 BenchmarkFF2M
 BenchmarkFF2M/wide
-BenchmarkFF2M/wide-8      	     441	   2696968 ns/op	   24584 B/op	       3 allocs/op
+BenchmarkFF2M/wide-8      	     441	   2685614 ns/op	   24584 B/op	       3 allocs/op
+BenchmarkFF2M/wide-8      	     441	   2692952 ns/op	   24584 B/op	       3 allocs/op
+BenchmarkFF2M/wide-8      	     445	   2688066 ns/op	   24584 B/op	       3 allocs/op
+BenchmarkFF2M/wide-8      	     445	   2688703 ns/op	   24584 B/op	       3 allocs/op
+BenchmarkFF2M/wide-8      	     444	   2688951 ns/op	   24584 B/op	       3 allocs/op
 BenchmarkFF2M/deep
-BenchmarkFF2M/deep-8      	     429	   2775034 ns/op	   53768 B/op	      21 allocs/op
+BenchmarkFF2M/deep-8      	     430	   2770504 ns/op	   53768 B/op	      21 allocs/op
+BenchmarkFF2M/deep-8      	     421	   2794279 ns/op	   53768 B/op	      21 allocs/op
+BenchmarkFF2M/deep-8      	     429	   2784456 ns/op	   53768 B/op	      21 allocs/op
+BenchmarkFF2M/deep-8      	     429	   2786887 ns/op	   53768 B/op	      21 allocs/op
+BenchmarkFF2M/deep-8      	     422	   2798867 ns/op	   53768 B/op	      21 allocs/op
 BenchmarkFF2MBackprop
 BenchmarkFF2MBackprop/wide
-BenchmarkFF2MBackprop/wide-8         	      81	  14331912 ns/op	98063836 B/op	      52 allocs/op
+BenchmarkFF2MBackprop/wide-8         	      72	  15383609 ns/op	98142822 B/op	      76 allocs/op
+BenchmarkFF2MBackprop/wide-8         	      75	  15187830 ns/op	98142823 B/op	      76 allocs/op
+BenchmarkFF2MBackprop/wide-8         	      78	  15276011 ns/op	98142823 B/op	      76 allocs/op
+BenchmarkFF2MBackprop/wide-8         	      72	  15427685 ns/op	98142809 B/op	      76 allocs/op
+BenchmarkFF2MBackprop/wide-8         	      78	  15321975 ns/op	98142883 B/op	      76 allocs/op
 BenchmarkFF2MBackprop/deep
-BenchmarkFF2MBackprop/deep-8         	      79	  14243823 ns/op	97303838 B/op	      94 allocs/op
+BenchmarkFF2MBackprop/deep-8         	      76	  16823246 ns/op	97467495 B/op	     292 allocs/op
+BenchmarkFF2MBackprop/deep-8         	      79	  14840372 ns/op	97467478 B/op	     292 allocs/op
+BenchmarkFF2MBackprop/deep-8         	      80	  14733608 ns/op	97467505 B/op	     292 allocs/op
+BenchmarkFF2MBackprop/deep-8         	      78	  14791821 ns/op	97467474 B/op	     292 allocs/op
+BenchmarkFF2MBackprop/deep-8         	      80	  14792402 ns/op	97467493 B/op	     292 allocs/op
 ```
 
 ## Network format
