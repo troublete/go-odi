@@ -12,6 +12,7 @@ const (
 	ActivationSigmoid float64 = iota - 1
 	ActivationRelu
 	ActivationIdentity
+	ActivationSoftmax
 )
 
 var (
@@ -52,6 +53,10 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 	var next []float64
 	var inout []float64
 
+	// for training with softmax we need to track the format ids of the out values in record;
+	// so they can be adjusted layer wide according to softmax application
+	var inoutvalidx []int
+
 	var lit int // layer iterator
 	var nit int // neuron iterator
 
@@ -63,7 +68,10 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 		lact = n[lstart-1]               // activation function for layer
 
 		next = make([]float64, 0, lsize)
-		for lit = lstart; lit < lend; lit += nesize {
+		if record {
+			inoutvalidx = []int{}
+		}
+		for lit = lstart; lit < lend; lit += nesize { // neuron loop
 			nevalue = n[lit] // bias
 
 			for nit = range nprev {
@@ -80,14 +88,28 @@ func (n Network) Forward(in ...float64) ([]float64, []float64, error) {
 				nevalue = Relu(nevalue)
 			case ActivationIdentity:
 				nevalue = Identity(nevalue)
+			case ActivationSoftmax:
+				// do nothing; must be applied to whole layer
 			default:
 				return nil, nil, ErrUnknownActivation
 			}
 
 			if record {
 				inout = append(inout, nevalue) // record outputs
+				inoutvalidx = append(inoutvalidx, len(inout)-1)
 			}
 			next = append(next, nevalue)
+		}
+
+		switch lact {
+		case ActivationSoftmax:
+			next = Softmax(next)
+			if record {
+				for i, o := range inoutvalidx {
+					inout[o] = next[i]
+				}
+			}
+		default:
 		}
 
 		lstart = lend
@@ -167,6 +189,7 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 
 	// calculate output error signal
 	oerr := make([]float64, len(out)) // output error signal
+	ce := false
 	var outact func(float64) float64
 	switch n[m.LayerIndex[len(m.LayerIndex)-1]+1] {
 	case ActivationSigmoid:
@@ -174,12 +197,18 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 	case ActivationRelu:
 		outact = DerivativeRelu
 	case ActivationIdentity:
-		outact = DerivativeIdentity
+		fallthrough
+	case ActivationSoftmax:
+		ce = true // cross entropy
 	default:
 		// unreachable, as the forward pass would already exit
 	}
 	for i, o := range out {
-		oerr[i] = (want[i] - o) * outact(o)
+		if ce {
+			oerr[i] = want[i] - o
+		} else {
+			oerr[i] = (want[i] - o) * outact(o)
+		}
 	}
 
 	recidx := len(record)
@@ -191,6 +220,7 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 		recidx = recidx - int(lsize*(1+ninputs)) // record start idx
 		plidx := m.LayerIndex[i-1] + 1           // previous layer activation
 
+		softmax := false
 		var lact func(float64) float64
 		switch n[plidx] {
 		case ActivationSigmoid:
@@ -199,28 +229,46 @@ func (n Network) Backpropagate(in []float64, want []float64, learningRate float6
 			lact = DerivativeRelu
 		case ActivationIdentity:
 			lact = DerivativeIdentity
+		case ActivationSoftmax:
+			softmax = true
 		default:
 			// unreachable, as forward pass will already flag it
 		}
 
 		properr := make([]float64, int(ninputs))
 		for ne := range int(lsize) {
-			oer := oerr[ne]
+			er := oerr[ne]
 
+			bidx := lidx + (ne * (int(ninputs) + 1)) // bias idx
 			// add changes to bias
-			bidx := lidx + (ne * (int(ninputs) + 1))
-			changes[bidx] = changes[bidx] + learningRate*math.Tanh(oer)
+			changes[bidx] = changes[bidx] + learningRate*math.Tanh(er)
 
 			for pi := range int(ninputs) {
 				input := record[recidx+pi]
-				widx := lidx + (ne * (int(ninputs) + 1)) + pi + 1
+				widx := lidx + (ne * (int(ninputs) + 1)) + pi + 1 // weight idx
 
 				// add changes to the weight
-				grad := input * oer
+				grad := input * er
 				wchg := math.Tanh(grad) * learningRate
 				changes[widx] = changes[widx] + wchg
 
-				properr[pi] = properr[pi] + lact(input)*(oer*n[widx]) // collect propagation error
+				if softmax {
+					properr[pi] = properr[pi] + er*n[widx]
+				} else {
+					properr[pi] = properr[pi] + lact(input)*(er*n[widx]) // collect propagation error
+				}
+			}
+
+		}
+
+		if softmax {
+			blame := 0.0
+			for pi := range int(ninputs) {
+				blame = blame + record[recidx+pi]*properr[pi]
+			}
+
+			for pi := range int(ninputs) {
+				properr[pi] = record[recidx+pi] * (properr[pi] - blame)
 			}
 		}
 

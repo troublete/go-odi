@@ -29,3 +29,23 @@ func Identity(x float64) float64 {
 func DerivativeIdentity(_ float64) float64 {
 	return 1
 }
+
+func Softmax(in []float64) []float64 {
+	out := make([]float64, len(in))
+	// m and v-m are precautions so .Exp isn't becoming invalid
+	var m float64
+	for _, v := range in {
+		if v > m {
+			m = v
+		}
+	}
+	var sum float64
+	for k, v := range in {
+		out[k] = math.Exp(v - m)
+		sum = sum + out[k]
+	}
+	for i := range out {
+		out[i] = out[i] / sum
+	}
+	return out
+}
